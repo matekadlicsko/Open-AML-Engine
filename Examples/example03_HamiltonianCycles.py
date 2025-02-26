@@ -614,8 +614,8 @@ if __name__ == "__main__":
 
     if computeFullCrossing:
         # Use full crossing
-
-        embedder = aml.fullCrossingEmbedder(model)
+        # Only for very samll grpahs (fewer than 30 nodes)
+        embedder = aml.full_crossing_embedder(model)
         embedder.params.sortDuples = True  # sorts the duples so the full crossing calculation is as fast as possible
         embedder.params.calculateRedundancy = True
         embedder.params.removeRepetitions = True

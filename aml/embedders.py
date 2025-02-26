@@ -48,9 +48,9 @@ class full_crossing_embedder:
 
     def enforce(self, duples):
         rels = duples.copy()
+        if self.params.sortDuples and len(rels) > 0:
+            rels = self.sortDuplesBySolvability(self.model.atomization, rels)
         while len(rels) > 0:
-            if self.params.sortDuples:
-                rels = self.sortDuplesBySolvability(self.model.atomization, rels)
             r = rels.pop(0)
             (
                 disc,
@@ -67,7 +67,8 @@ class full_crossing_embedder:
                     calculateRedundancy=self.params.calculateRedundancy,
                     binary=self.params.binary,
                 )
-
+                if self.params.sortDuples:
+                    rels = self.sortDuplesBySolvability(self.model.atomization, rels)
 
 class params_sparse:
     def __init__(
