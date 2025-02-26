@@ -39,6 +39,8 @@ randseed = 12345
 # 2: Sheehan graph
 problem = 1
 
+aml.config.verbosityLevel = aml.config.Verbosity.Info
+
 # -------------------------------------------------------------
 
 
@@ -540,8 +542,8 @@ if __name__ == "__main__":
         ady = petersen_graph_adjacency(n, 2)
         graphname = " petersen " + str(nVertexes)
     elif problem == 2:
-        # once the only Hamiltonian cycle is found, 
-        #   the embedding becomes inconsistent if combineWithTraining = True  
+        # once the only Hamiltonian cycle is found,
+        #   the embedding becomes inconsistent if combineWithTraining = True
         nVertexes = 30
         ady = sheehan_graph_adjacency(nVertexes)
         graphname = " sheehan " + str(nVertexes)

@@ -6,6 +6,8 @@ import random
 
 import aml
 
+# --------------------------------------------------------------------
+# Configuration
 
 # Training iterations
 iterations = 5000  # Maximum number of mini-batch iterations
@@ -31,6 +33,8 @@ saveAtomization = False
 # 3: even number of vertical bars
 problem = 0
 
+aml.config.verbosityLevel = aml.config.Verbosity.Info
+
 
 class trainingParameters:
     def __init__(self):
@@ -39,6 +43,9 @@ class trainingParameters:
         self.initialNTrainingExamples = 2000  # inital batch size negative relations
         self.sizeOfQuickTest = 200  # test every 10 iterations
         self.sizeOfFullTest = 1000  # test every iteration
+
+
+# --------------------------------------------------------------------
 
 
 def createBackgroundForEvenOdd(size, columns):
@@ -271,11 +278,11 @@ def batchTraining(
         if fullTest:
             # union model accuracy must increase with training
             print("Test on reseve")
-            las = aml.calculateLowerAtomicSegment(embedder.lastUnionModel, testConsts, True) 
+            las = aml.calculateLowerAtomicSegment(embedder.lastUnionModel, testConsts, True)  # fmt:skip
             testSpace.calculateLowerAtomicSegments(embedder.lastUnionModel, las)
             if False:
                 # this meassures the error rate at the optimal misses cutoff
-                # error rate values for an optimal cutoff larger than 1 are only orientative 
+                # error rate values for an optimal cutoff larger than 1 are only orientative
                 # and do not represtn a valid metric
                 (
                     strTestResultOnUnionModel,
@@ -288,7 +295,6 @@ def batchTraining(
                     strTestResultOnUnionModel,
                     testResultOnUnionModel,
                 ) = aml.evaluateUsingUnionModel(testSet, region, mises)
-
 
             print("unionModel error:", strTestResultOnUnionModel)
             strReportError = strTestResultOnUnionModel

@@ -15,7 +15,7 @@ class Verbosity:
 
 
 # Default verbosity level for logging functions
-verbosityLevel = Verbosity.Info
+verbosityLevel = Verbosity.Warn
 
 # ------------------------------------------------------------------------------
 class compiledFunc:

@@ -8,6 +8,9 @@ import sys
 import aml
 from MNIST import mnistGenerator, datasetType
 
+# --------------------------------------------------------------------
+# Configuration
+
 # Training iterations
 iterations = 5000  # Maximum number of mini-batch iterations
 num_batches_for_periodic_test = 10  # Report FPR and FPN on the test set
@@ -18,6 +21,8 @@ mnist_numclasses = 10
 gray_threshold = 256 / 10
 
 saveAtomization = False  # Save the model everytime a full test is performed
+
+aml.config.verbosityLevel = aml.config.Verbosity.Info
 
 
 class trainingParameters:
@@ -32,6 +37,9 @@ class trainingParameters:
         self.sizeOfFullTest: int  # defined based on dataset
         self.valSize = 10000
         self.fullDatasetAtBatch = 500
+
+
+# --------------------------------------------------------------------
 
 
 def digitToConstants(d):

@@ -33,7 +33,7 @@ displayDuplesAtInitialization = False
 # Random seed for reproducibility
 randseed = 123456789
 
-aml.config.verbosityLevel = aml.config.Verbosity.Warn
+aml.config.verbosityLevel = aml.config.Verbosity.Info
 
 # --------------------------------------------------------------------
 
