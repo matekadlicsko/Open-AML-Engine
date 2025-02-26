@@ -439,7 +439,7 @@ def showWithSortedPaths(links):
                 visited_noedes.append(node2)
                 break
 
-    print("In path order:")
+    print("In consecutive order along the path(s):")
     print(
         [str(e) + "([" + str(v1) + "," + str(v2) + "])" for v1, v2, e in sorted_edges]
     )
@@ -537,9 +537,11 @@ if __name__ == "__main__":
         graphname = f"{nVertexes} RANDOM"
     elif problem == 1:
         # When n is congruent with 3 modulo 6, it has exactly 3 Hamiltonian cycles.
+        # For other values of n and k the number of cycles can vary. 
         n = 9
+        k = 2
         nVertexes = 2 * n
-        ady = petersen_graph_adjacency(n, 2)
+        ady = petersen_graph_adjacency(n, k)
         graphname = " petersen " + str(nVertexes)
     elif problem == 2:
         # once the only Hamiltonian cycle is found,
@@ -614,25 +616,14 @@ if __name__ == "__main__":
 
     if computeFullCrossing:
         # Use full crossing
-        # Only for very samll grpahs (fewer than 30 nodes)
+        # Only for very samll graphs (fewer than 30 nodes)
         embedder = aml.full_crossing_embedder(model)
         embedder.params.sortDuples = True  # sorts the duples so the full crossing calculation is as fast as possible
         embedder.params.calculateRedundancy = True
         embedder.params.removeRepetitions = True
-
-        embedder.enforce(pduples)
-
-        if saveAtomization:
-            aml.saveAtomizationOnFile(
-                model.atomization,
-                model.cmanager,
-                "model_" + graphname,
-            )
     else:
         # Use sparse crossing
-
         embedder = aml.sparse_crossing_embedder(model)
-
         reversedNameDictionary = model.cmanager.reversedNameDict
 
         embedder.params.storePositives = False
@@ -644,32 +635,41 @@ if __name__ == "__main__":
         # larger values than the default 0.1 may improve variability
         embedder.params.negativeIndicatorThreshold = 0.5
 
-        initial = aml.atomizationCopy(model.atomization)
+    initial = aml.atomizationCopy(model.atomization)
 
-        pathDict = {}
-        hamiltonianCycle_count = 0
-        hamiltonianPath_count = 0
-        subhamiltonian_count = 0
+    pathDict = {}
+    hamiltonianCycle_count = 0
+    hamiltonianPath_count = 0
+    subhamiltonian_count = 0
 
-        rString = ""
-        pathkey = ""
-        lastpathkey = ""
-        WP = model.cmanager.definedWithName["WRONGPATH"]
-        CX = aml.CSegment(embedding["contextConstants"])
-        attempt = 0
-        while attempt < maxAttempts:
-            print(
-                f"           attempts: {attempt}",
-                f" subhamiltonian: {subhamiltonian_count}",
-                f" hamiltonian paths: {hamiltonianPath_count}",
-                f" hamiltonian cycles: {hamiltonianCycle_count}",
-                f" {graphname}",
-                "------------------",
-            )
-            attempt += 1
+    rString = ""
+    pathkey = ""
+    lastpathkey = ""
+    WP = model.cmanager.definedWithName["WRONGPATH"]
+    CX = aml.CSegment(embedding["contextConstants"])
+    attempt = 0
+    while attempt < maxAttempts:
+        print(
+            f"           attempts: {attempt}",
+            f" subhamiltonian: {subhamiltonian_count}",
+            f" hamiltonian paths: {hamiltonianPath_count}",
+            f" hamiltonian cycles: {hamiltonianCycle_count}",
+            f" {graphname}",
+            "------------------",
+        )
+        attempt += 1
 
+        if computeFullCrossing:
+            embedder.enforce(pduples)
+            
+            if saveAtomization:
+                aml.saveAtomizationOnFile(
+                    model.atomization,
+                    model.cmanager,
+                    "model_" + graphname,
+                )
+        else:
             print("           unionModel:", len(embedder.unionModel), "\n")
-
             nduplesExt = nduples.copy()
             if lastpathkey == pathkey:
                 # same path than the previus attempt
@@ -689,96 +689,97 @@ if __name__ == "__main__":
 
             embedder.enforce(pduples, nduplesExt)
 
-            selection, _, inconsistent = aml.selectAtomsFromNegativeDuplesAndExplicit(
-                model.atomization, nduples, [], True, CX
-            )
-            if inconsistent:
-                print("Error: Inconsistent embedding")
-                print("The embedding has some logical contradiction.")
-                sys.exit(1)
+        selection, _, inconsistent = aml.selectAtomsFromNegativeDuplesAndExplicit(
+            model.atomization, nduples, [], True, CX
+        )
+        if inconsistent:
+            print("Error: Inconsistent embedding")
+            print("The embedding has some logical contradiction.")
+            sys.exit(1)
 
-            printPath(selection, embedding)
+        printPath(selection, embedding)
 
-            lastpathkey = pathkey
-            (
-                paths,
-                vertexesInPaths,
-                loops,
-                connected,
-                hamiltonian,
-                completable,
-                hasIsolatedVertexes,
-                pathkey,
-                links,
-            ) = interpret(selection, doCompletions, embedding)
-            print(f"pieces: {len(paths)} loops {loops}")
+        lastpathkey = pathkey
+        (
+            paths,
+            vertexesInPaths,
+            loops,
+            connected,
+            hamiltonian,
+            completable,
+            hasIsolatedVertexes,
+            pathkey,
+            links,
+        ) = interpret(selection, doCompletions, embedding)
+        print(f"pieces: {len(paths)} loops {loops}")
 
-            isnew = False
-            if pathkey not in pathDict:
-                pathDict[pathkey] = 0
-                isnew = True
-            pathDict[pathkey] += 1
+        isnew = False
+        if pathkey not in pathDict:
+            pathDict[pathkey] = 0
+            isnew = True
+        pathDict[pathkey] += 1
+
+        if isnew:
+            print("New Path")
+        else:
+            print("Repeated Path")
+
+        if hamiltonian:
+            print("--- Hamiltonian!! -----")
 
             if isnew:
-                print("New Path")
-            else:
-                print("Repeated Path")
+                if loops == 1:
+                    hamiltonianCycle_count += 1
+                else:
+                    hamiltonianPath_count += 1
 
-            if hamiltonian:
-                print("--- Hamiltonian!! -----")
+                if drawFoundGraph:
+                    drawPath(selection, embedding)
+                    aml.printLSpectrum(selection, None)
 
-                if isnew:
-                    if loops == 1:
-                        hamiltonianCycle_count += 1
-                    else:
-                        hamiltonianPath_count += 1
-
-                    if drawFoundGraph:
-                        showWithSortedPaths(links)
-                        drawPath(selection, embedding)
-                        aml.printLSpectrum(selection, None)
-
-            if len(vertexesInPaths) == nVertexes and not hamiltonian:
-                if isnew:
-                    subhamiltonian_count += 1
-
-            # report results
+        if len(vertexesInPaths) == nVertexes and not hamiltonian:
             if isnew:
-                if hamiltonian and loops == 1:
-                    rString += "O"
-                elif hamiltonian:
-                    rString += "H"
-                else:
-                    rString += "_"
+                subhamiltonian_count += 1
+
+        # report results
+        if isnew:
+            if hamiltonian and loops == 1:
+                showWithSortedPaths(links)
+                rString += "O"
+            elif hamiltonian:
+                showWithSortedPaths(links)
+                rString += "H"
             else:
-                rString += " "
-            print(rString)
+                rString += "_"
+        else:
+            rString += " "
+        print(rString)
 
-            learnable = (
-                ((len(vertexesInPaths) == nVertexes) and not completable)
-                or hasIsolatedVertexes
-                or loops > 0
-            )
+        learnable = (
+            ((len(vertexesInPaths) == nVertexes) and not completable)
+            or hasIsolatedVertexes
+            or loops > 0
+        )
 
-            # declare WRONGPATH the current path or its subcycles
-            if learnable and combineWithTraining and isnew:
-                E = [{e} for e in embedding["EConstants"]]
-                P = set(embedding["PConstants"])
-                WRONGPATH = set(embedding["WrongConstants"])
+        # declare WRONGPATH the current path or its subcycles
+        if learnable and combineWithTraining and isnew:
+            E = [{e} for e in embedding["EConstants"]]
+            P = set(embedding["PConstants"])
+            WRONGPATH = set(embedding["WrongConstants"])
 
-                if loops > 0:
-                    loopPaths = getCycles(paths)
-                    for loop in loopPaths:
-                        term = set()
-                        for e in loop:
-                            term |= E[e]
-                        rlt = aml.Duple(aml.LCSegment(WRONGPATH), aml.LCSegment(term), True, model.generation, 2)  # fmt:skip
-                        pduples.append(rlt)
-
-                else:
-                    edges = getEdges(paths)
+            if loops > 0:
+                loopPaths = getCycles(paths)
+                for loop in loopPaths:
                     term = set()
-                    for e in edges:
+                    for e in loop:
                         term |= E[e]
-                    rlt = aml.Duple(aml.LCSegment(WRONGPATH), aml.LCSegment(term), True, model.generation, 2) # fmt:skip
+                    rlt = aml.Duple(aml.LCSegment(WRONGPATH), aml.LCSegment(term), True, model.generation, 2)  # fmt:skip
                     pduples.append(rlt)
+
+            else:
+                edges = getEdges(paths)
+                term = set()
+                for e in edges:
+                    term |= E[e]
+                rlt = aml.Duple(aml.LCSegment(WRONGPATH), aml.LCSegment(term), True, model.generation, 2) # fmt:skip
+                pduples.append(rlt)
