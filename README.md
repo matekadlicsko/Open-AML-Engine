@@ -44,6 +44,10 @@ If you plan to run example04_mnist.py you will need to obtain the MNIST dataset 
 
 The dataset can be downloaded from [Yann Lecun MNIST](http://yann.lecun.com/exdb/mnist/) database or [Huggingface](https://huggingface.co/datasets/ylecun/mnist).
 
+## How to cite
+
+Work done with this engine should be cited with [Algebraic Machine Learning: Learning as computing an algebraic decomposition of a task](https://arxiv.org/abs/2502.19944).
+
 ## FAQ
 
 ### When using the library I get "Illegal instruction (core dumped)"
