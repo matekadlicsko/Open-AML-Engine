@@ -20,7 +20,8 @@ void storeTracesOfConstants(
 void considerPositiveDuples(void* tr, void* duples, void* gsm);
 void simplifyFromConstants_inner_loop(
     void** ret_selected, const uint32_t constants_len, void* las[], void* tD[], void* constToStoredTraces[],
-    const uint32_t atomization_len, void* atomization_traces[], const uint32_t total_indicators_len, void* gsm);
+    const uint32_t atomization_len, void* atomization_traces[], const uint32_t total_indicators_len, unsigned int seed,
+    void* gsm);
 void updateUnionModelWithSetOfPduples(
     void** atoms_to_keep, void** atoms_deleted, void** exclude_from_pinningterm, void* unionModel, void* duples,
     int64_t* unionUpdateEntrance, int64_t* lastUnionUpdate, void* gsm);
@@ -30,13 +31,13 @@ void calculateLowerAtomicSegments(
 uint32_t crossAll(
     void** ret_crossed, void** ret_not_crossed, int* ret_lastj, uint32_t* ret_epoch, void* atomization, void* constants,
     void* positive_duples, void** stored_trace_of_constant, uint32_t total_indicators_len,
-    _Bool* do_not_store_these_rels, struct CrossAll_Params params, void* gsm);
+    _Bool* do_not_store_these_rels, struct CrossAll_Params params, unsigned int seed, void* gsm);
 void selectAllUsefulIndicators(
     void** take, void** duples_keep, uint32_t duples_len, void* discardedIndicators, void* rel_L_freeTrace[],
     void* rel_H_freeTrace[], _Bool duples_hyp[], _Bool verbose, void* gsm);
 void reduceIndicators(
     uint32_t duples_len, uint32_t num_indicators, void** discardedIndicators, void* rel_L_freeTrace[],
-    void* rel_H_freeTrace[], void** singles, _Bool verbose, void* gsm);
+    void* rel_H_freeTrace[], void** singles, _Bool verbose, unsigned int seed, void* gsm);
 
 /* TraceHelper */
 void* TraceHelper_init_from_python(void* constants, int indicators_num, void** atomIDs, void*** tD, void* gsm);

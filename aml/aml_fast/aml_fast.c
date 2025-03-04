@@ -562,8 +562,10 @@ int segment_chooseItemIn_withBuffer(segmentHead* out, int* buffer)
 void simplifyFromConstants_inner_loop(
     segmentHead** ret_selected, const uint32_t constants_len, segmentHead* las[], segmentHead* tD[],
     segmentHead* constToStoredTraces[], const uint32_t atomization_len, segmentHead* atomization_traces[],
-    const uint32_t total_indicators_len, generalSegmentManager* gsm)
+    const uint32_t total_indicators_len, unsigned int seed, generalSegmentManager* gsm)
 {
+    srand(seed);
+
     segmentHead* maxTrace = NULL;
     segment_fillWithRange(&maxTrace, 0, total_indicators_len, gsm);
 
@@ -1324,9 +1326,11 @@ uint32_t countSizeNotOne(Atomization_s* atomization)
 uint32_t crossAll(
     segmentHead** ret_crossed, segmentHead** ret_not_crossed, int* ret_lastj, uint32_t* ret_epoch,
     Atomization_s* atomization, CS* constants, Duples* positive_duples, segmentHead** stored_trace_of_constant,
-    uint32_t total_indicators_len, _Bool* do_not_store_these_rels, struct CrossAll_Params params,
+    uint32_t total_indicators_len, _Bool* do_not_store_these_rels, struct CrossAll_Params params, unsigned int seed,
     generalSegmentManager* gsm)
 {
+    srand(seed);
+
     IF_THEN_ABORT(*ret_crossed, "crossAll (ret_crossed): Output bitarrays must be initialized to NULL.");
     IF_THEN_ABORT(
         *ret_not_crossed,
@@ -1455,8 +1459,10 @@ void selectAllUsefulIndicators(
 
 void reduceIndicators(
     uint32_t duples_len, uint32_t num_indicators, segmentHead** discardedIndicators, segmentHead* rel_L_freeTrace[],
-    segmentHead* rel_H_freeTrace[], segmentHead** singles, bool verbose, generalSegmentManager* gsm)
+    segmentHead* rel_H_freeTrace[], segmentHead** singles, bool verbose, unsigned int seed, generalSegmentManager* gsm)
 {
+    srand(seed);
+
     // Create index array to be shuffled
     uint32_t idx_arr[duples_len];
     for (uint32_t k = 0; k < duples_len; ++k) {

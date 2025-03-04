@@ -381,8 +381,6 @@ def considerPositiveDuples(tracer, pduples):
 
 
 def simplifyFromConstants(tracer, constants, atoms, generation):
-    import random
-
     maxTrace = amlset([i for i in range(tracer.numIndicators())])
 
     tD = [None] * len(maxTrace)
@@ -443,6 +441,7 @@ def simplifyFromConstants(tracer, constants, atoms, generation):
         len(atoms),
         b_at_traces_ptr,
         tracer.numIndicators(),
+        random.randint(0, 4_294_967_295),
         bitarray.gsm,
     )
 
@@ -714,6 +713,7 @@ def crossAll(embedder, exampleSet):
             "simplify_threshold": embedder.params.simplify_threshold,
             "ignore_single_const_ucs": embedder.params.ignore_single_const_ucs,
         },
+        random.randint(0, 4_294_967_295),
         bitarray.gsm,
     )
 
@@ -838,6 +838,7 @@ def reduceIndicators(self, nduplesIn, reversedNameDictionary, singles):
         rel_H_freeTrace_ptr,
         singles_ptr,
         bool(config.Verbosity.Info >= config.verbosityLevel),  # verbose
+        random.randint(0, 4_294_967_295),
         bitarray.gsm,
     )
 
