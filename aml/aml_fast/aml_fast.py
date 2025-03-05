@@ -6,6 +6,7 @@ from .amlCompiledLibrary import lib as caml
 from .amlFastBitarrays import bitarray
 import functools
 import time
+import random
 
 from .. import amlset
 from ..io import logDebug, logInfo, logWarn, logError, logCrit
