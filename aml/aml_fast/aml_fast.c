@@ -596,7 +596,6 @@ void simplifyFromConstants_inner_loop(
                 IF_THEN_WARN(!candidates, "Simplify From Constants: Trace error B");
                 if (!candidates) {
                     segment_removeItem(&out, eta_idx, gsm);
-                    break;
                 }
             } else {
                 IF_THEN_ABORT(!candidates, "Simplify From Constants: Trace error B");
@@ -607,12 +606,15 @@ void simplifyFromConstants_inner_loop(
             {
                 int at_idx;
                 if (!aux) {
-                    at_idx = segment_chooseItemIn_withBuffer(candidates, buffer);
-                    segment_addItem(ret_selected, at_idx, gsm);
+                    if (candidates) {		 
+                        at_idx = segment_chooseItemIn_withBuffer(candidates, buffer);
+                        segment_addItem(ret_selected, at_idx, gsm);
+                        segment_intersect(&out, atomization_traces[at_idx], gsm);
+		    }
                 } else {
                     at_idx = segment_chooseItemIn_withBuffer(aux, buffer);
+                    segment_intersect(&out, atomization_traces[at_idx], gsm);
                 }
-                segment_intersect(&out, atomization_traces[at_idx], gsm);
             }
             generalSegmentManager_returnSegment(gsm, &aux);
             generalSegmentManager_returnSegment(gsm, &candidates);
@@ -1061,7 +1063,6 @@ void reduction_by_traces(
                 IF_THEN_WARN(!candidates, "Simplify From Constants: Trace error B");
                 if (!candidates) {
                     segment_removeItem(&out, eta_idx, gsm);
-                    break;
                 }
             } else {
                 IF_THEN_ABORT(!candidates, "Simplify From Constants: Trace error B");
@@ -1072,12 +1073,15 @@ void reduction_by_traces(
             {
                 int at_idx;
                 if (!aux) {
-                    at_idx = segment_chooseItemIn_maxSizeKnown(candidates, atomization->len, buffer);
-                    segment_addItem(&selectedIds, at_idx, gsm);
+                    if (candidates) {
+                        at_idx = segment_chooseItemIn_maxSizeKnown(candidates, atomization->len, buffer);
+                        segment_addItem(&selectedIds, at_idx, gsm);
+                        segment_intersect(&out, atomization->atoms[at_idx].trace, gsm);
+                    }
                 } else {
                     at_idx = segment_chooseItemIn_maxSizeKnown(aux, atomization->len, buffer);
+                    segment_intersect(&out, atomization->atoms[at_idx].trace, gsm);
                 }
-                segment_intersect(&out, atomization->atoms[at_idx].trace, gsm);
             }
             generalSegmentManager_returnSegment(gsm, &aux);
             generalSegmentManager_returnSegment(gsm, &candidates);
