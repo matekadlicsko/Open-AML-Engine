@@ -59,3 +59,8 @@ If that is the case, remove the following lines from `build_amlFastLibrary.py`.
 "-msse2",
 "-march=core-avx2",
 ```
+
+-----
+
+
+![EU Flag](./eu_flag.jpg | height=45px) This project has received funding from the European Union’s Horizon 2020 research and innovation programme under grant agreement No 952091.
