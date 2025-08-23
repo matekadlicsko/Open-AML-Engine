@@ -474,7 +474,6 @@ class sparse_crossing_embedder:
             # -----------------------------------------------------------------
             aux = atoms.copy()
             aux.extend(initial)
-            space.traceAll(self.tracer, aux)
         else:
             cexamples = nDuples.copy()
             random.shuffle(cexamples)
